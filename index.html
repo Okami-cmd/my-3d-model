@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Модель участка</title>
+    <title>3D Макет участка земли</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <style>
         * {
@@ -52,21 +52,14 @@
             border-radius: 10px;
             border-left: 4px solid #2ecc71;
         }
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            flex-direction: column;
-        }
-        .loading-spinner {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .error {
+            text-align: center;
+            margin-top: 20px;
+            color: #e74c3c;
+            padding: 15px;
+            background: #fde8e8;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
         }
     </style>
 </head>
@@ -75,7 +68,8 @@
         <h1>3D Макет участка земли</h1>
         <div class="model-container">
             <model-viewer 
-                src="3d1.stl"
+                id="modelViewer"
+                src="model.glb"
                 alt="3D модель участка земли"
                 camera-controls
                 auto-rotate
@@ -85,29 +79,47 @@
                 camera-orbit="0deg 75deg 105%"
                 field-of-view="30deg">
                 
-                <div class="loading" slot="progress-bar">
-                    <div class="loading-spinner">🔄</div>
-                    <p>Загрузка 3D модели...</p>
+                <div slot="progress-bar" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🔄</div>
+                        <p>Загрузка 3D модели...</p>
+                    </div>
                 </div>
             </model-viewer>
         </div>
-        <div class="info">
+
+        <div class="info" id="infoMessage">
             <h3>✅ 3D Модель загружена с GitHub</h3>
-            <p>Файл: 3d1.GLB | Используйте мышь для вращения модели</p>
+            <p>Файл: model.glb | Используйте мышь для вращения модели</p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const modelViewer = document.querySelector('model-viewer');
+            const modelViewer = document.getElementById('modelViewer');
+            const infoMessage = document.getElementById('infoMessage');
             
             modelViewer.addEventListener('load', () => {
                 console.log('✅ 3D модель успешно загружена!');
+                infoMessage.innerHTML = `
+                    <h3 style="color: #27ae60;">✅ 3D Модель успешно загружена!</h3>
+                    <p>Файл: model.glb | Используйте мышь для вращения модели</p>
+                `;
             });
             
             modelViewer.addEventListener('error', (e) => {
                 console.error('❌ Ошибка загрузки:', e);
-                alert('Ошибка загрузки модели. Проверьте консоль для деталей.');
+                infoMessage.className = 'error';
+                infoMessage.innerHTML = `
+                    <h3>❌ Ошибка загрузки модели</h3>
+                    <p>Проверьте:</p>
+                    <ul style="text-align: left; margin: 10px 0;">
+                        <li>✓ Файл model.glb существует в репозитории</li>
+                        <li>✓ Расширение файла .glb (не .GLB)</li>
+                        <li>✓ GitHub Pages включен</li>
+                    </ul>
+                    <p><small>Текущий путь: ${modelViewer.src}</small></p>
+                `;
             });
         });
     </script>
